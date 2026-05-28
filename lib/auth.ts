@@ -25,8 +25,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       server: "smtp://localhost:1025",
       from: "Dispo <noreply@dispo.app>",
       sendVerificationRequest: async ({ identifier, url }) => {
-        if (process.env.NODE_ENV !== "production") {
-          console.log("\n🔗 Magic link pour", identifier, ":\n", url, "\n");
+        // Always log the link (visible in Vercel function logs)
+        console.log("\n🔗 Magic link pour", identifier, ":\n", url, "\n");
+
+        if (!process.env.RESEND_API_KEY) {
+          // No email provider configured — link is in the logs above
           return;
         }
         const { Resend } = await import("resend");
